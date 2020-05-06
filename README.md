@@ -31,3 +31,7 @@ python3 app.py
 ```
 
 Open your browser to [http://localhost:8080](http://localhost:8080)
+
+# Live Demo
+
+Merges into `master` automatically deploy to: https://hangman-evolution.herokuapp.com/
