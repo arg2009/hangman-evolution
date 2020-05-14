@@ -104,12 +104,18 @@ $( document ).ready(function () {
             $button.attr('data-value', letter);
             $lettersContainer.append($button);
         }
+
+        // Allow making a new game
+        $('button.reset-button').click(function () {
+            resetGame();
+        });
     }
 
     function resetGame() {
         showGame(false);
         showLoading(true);
         enableGame(false);
+        resetPlayedButtons();
 
         getRandomWord()
             .then(response => response.json())
@@ -174,7 +180,7 @@ $( document ).ready(function () {
     }
 
     function drawHangingMan() {
-
+        $hangingManElement.text(game.incorrectGuesses + "/" + 6);
     }
 
     /**
@@ -214,5 +220,11 @@ $( document ).ready(function () {
         $button.prop('disabled', true);
         $button.addClass('btn-secondary');
         $button.removeClass('btn-primary');
+    }
+
+    function resetPlayedButtons() {
+        let $buttons = $hangmanGame.find('.letters button');
+        $buttons.toggleClass('btn-secondary', false);
+        $buttons.toggleClass('btn-primary', true);
     }
 });
