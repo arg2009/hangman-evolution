@@ -146,7 +146,7 @@ $( document ).ready(function () {
         let $button = $(event.target);
 
         // Disable the button
-        $button.prop('disabled', true);
+        markButtonAsPlayed($button);
 
         // The letter
         let letter = $button.attr('data-value');
@@ -205,5 +205,14 @@ $( document ).ready(function () {
         } else {
             $hangmanGame.hide();
         }
+    }
+
+    /**
+     * @param {jQuery|HTMLElement} $button
+     */
+    function markButtonAsPlayed($button) {
+        $button.prop('disabled', true);
+        $button.addClass('btn-secondary');
+        $button.removeClass('btn-primary');
     }
 });
