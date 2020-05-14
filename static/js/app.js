@@ -1,20 +1,92 @@
 $( document ).ready(function () {
+    /*
+     * Classes
+     */
+    class RandomWord {
+        /**
+         * @param {string} word
+         * @param {string} hint
+         */
+        constructor(word, hint) {
+            this.word = word;
+            this.hint = hint;
+        }
+    }
+    /**
+     * @property {number} incorrectGuesses
+     * @property {array} wordInProgress
+     */
+    class Game {
+        fillCharacter = "_";
+
+        /**
+         * @param {string} word
+         * @param {string} hint
+         */
+        constructor(word, hint) {
+            this.init(word, hint);
+        }
+
+        /**
+         * @param {string} word
+         * @param {string} hint
+         */
+        init(word, hint) {
+            this.word = word.toUpperCase();
+            this.hint = hint;
+
+            this.incorrectGuesses = 0;
+            this.wordInProgress = this.word.split('').fill(this.fillCharacter);
+        }
+
+        /**
+         * Reveal the letter in the word.
+         *
+         * @param {string} letter
+         * @return {boolean}
+         */
+        playLetter(letter) {
+            let found = false;
+            for (let i=0; i < this.word.length; i++) {
+                if (this.word.charAt(i) === letter) {
+                    this.wordInProgress[i] = letter;
+                    found = true;
+                }
+            }
+
+            if (!found) {
+                this.incorrectGuesses++;
+            }
+
+            return found;
+        }
+
+        /**
+         * @return {boolean}
+         */
+        hasLost() {
+            return this.incorrectGuesses === 6;
+        }
+
+        /**
+         * @return {boolean}
+         */
+        hasWon() {
+            return this.wordInProgress.indexOf(this.fillCharacter) === -1;
+        }
+    }
+
+    /*
+     * Variables
+     */
     let $hangmanGame = $('#hangman-game');
     let $loadingElement = $('#loading .spinner-grow');
+    let $hangingManElement = $hangmanGame.find('.hanging-man');
+    let $wordInProgressElement = $hangmanGame.find('.word-in-progress');
+    let game = new Game("", "");
 
-    // Game state
-    let game;
-
-    showLoading(true);
     setupGame();
-    enableGame(false);
-
-    getRandomWord()
-        .then(response => response.json())
-        .then(data => {
-            let randomWord = new RandomWord(data.word, data.hint);
-            initGame(randomWord);
-        });
+    resetGame();
 
     function setupGame() {
         // Create letter template
@@ -34,12 +106,27 @@ $( document ).ready(function () {
         }
     }
 
+    function resetGame() {
+        showGame(false);
+        showLoading(true);
+        enableGame(false);
+
+        getRandomWord()
+            .then(response => response.json())
+            .then(data => {
+                let randomWord = new RandomWord(data.word, data.hint);
+                initGame(randomWord);
+            });
+    }
+
     /**
      *
      * @param {RandomWord} randomWord
      */
     function initGame(randomWord) {
-        game = new Game(randomWord.word, randomWord.hint);
+        game.init(randomWord.word, randomWord.hint);
+        drawHangingMan();
+        drawWordInProgress();
         showGame(true);
         enableGame(true);
         showLoading(false);
@@ -59,13 +146,35 @@ $( document ).ready(function () {
         let $button = $(event.target);
 
         // Disable the button
-        $button.prop('disabled', true);
+        markButtonAsPlayed($button);
 
         // The letter
         let letter = $button.attr('data-value');
 
         // Play the game
         game.playLetter(letter);
+
+        // Update the views
+        drawWordInProgress();
+        drawHangingMan();
+
+        if (game.hasLost()) {
+            alert('You have reached the maximum guesses! The word was: ' + game.word)
+            enableGame(false);
+        }
+
+        if (game.hasWon()) {
+            alert('You won! Well done!');
+            enableGame(false);
+        }
+    }
+
+    function drawWordInProgress() {
+        $wordInProgressElement.text(game.wordInProgress.toString());
+    }
+
+    function drawHangingMan() {
+
     }
 
     /**
@@ -98,47 +207,12 @@ $( document ).ready(function () {
         }
     }
 
-    class RandomWord {
-        /**
-         * @param {string} word
-         * @param {string} hint
-         */
-        constructor(word, hint) {
-            this.word = word;
-            this.hint = hint;
-        }
-    }
-
     /**
-     * @property {number} incorrectGuesses
-     * @property {array} wordInProgress
+     * @param {jQuery|HTMLElement} $button
      */
-    class Game {
-        /**
-         * @param {string} word
-         * @param {string} hint
-         */
-        constructor(word, hint) {
-            this.init(word, hint);
-        }
-
-        /**
-         * @param {string} word
-         * @param {string} hint
-         */
-        init(word, hint) {
-            this.word = word;
-            this.hint = hint;
-
-            this.incorrectGuesses = 0;
-            this.wordInProgress = this.word.split('').fill("");
-        }
-
-        /**
-         * @param {string} letter
-         */
-        playLetter(letter) {
-            // TODO: Implement
-        }
+    function markButtonAsPlayed($button) {
+        $button.prop('disabled', true);
+        $button.addClass('btn-secondary');
+        $button.removeClass('btn-primary');
     }
 });
