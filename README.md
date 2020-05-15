@@ -22,6 +22,7 @@ sudo apt-get install python3-pip
 git clone https://github.com/arg2009/hangman-evolution.git
 cd hangman-evolution
 pip3 install -r requirements.txt
+yoyo apply
 ```
 
 ## Launch the web app
