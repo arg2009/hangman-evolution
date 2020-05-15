@@ -4,7 +4,7 @@ A fun project to get to know python
 
 ## Requirements
 
-These requirements assumes you run linux.
+These requirements assumes you run a Debian based linux.
 
 If you run windows install WSL (Ubuntu) to run Linux on Windows.
 
