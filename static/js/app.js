@@ -83,6 +83,7 @@ $( document ).ready(function () {
     let $loadingElement = $('#loading .spinner-grow');
     let $hangingManElement = $hangmanGame.find('.hanging-man');
     let $wordInProgressElement = $hangmanGame.find('.word-in-progress');
+    let $wordHint = $hangmanGame.find('.word-hint');
     let game = new Game("", "");
 
     setupGame();
@@ -133,6 +134,7 @@ $( document ).ready(function () {
         game.init(randomWord.word, randomWord.hint);
         drawHangingMan();
         drawWordInProgress();
+        drawWordHint();
         showGame(true);
         enableGame(true);
         showLoading(false);
@@ -177,6 +179,10 @@ $( document ).ready(function () {
 
     function drawWordInProgress() {
         $wordInProgressElement.text(game.wordInProgress.toString());
+    }
+
+    function drawWordHint() {
+        $wordHint.text(game.hint);
     }
 
     function drawHangingMan() {
