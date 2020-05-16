@@ -13,7 +13,10 @@ urls = (
     '/', 'Index',
 
     # Game Routes
-    '/api/game', 'GameController'
+    '/api/game', 'GameController',
+    
+    # Usage Statistics Routes
+    '/api/usage', 'UsageController'
 )
 
 # Setup the default rendering engine
@@ -81,6 +84,46 @@ class GameController(ApiController):
         self.db_connection.commit()
 
 
+# /api/usage
+class UsageController(ApiController):
+    def GET(self):
+        db_cursor = self.db_connection.cursor()
+
+        # Collect usage statistics
+        sql = 'select ' \
+              'pg_max.played_word as word_most_played, ' \
+              'pg_min.played_word as word_least_played, ' \
+              'pg_wins.games_won as games_won, ' \
+              'pg_losses.games_lost as games_lost ' \
+              'from (' \
+              'select ' \
+              'played_word, MAX(occurrences) as occurrences ' \
+              'from (select played_word, count(*) as occurrences from played_games GROUP BY played_word)' \
+              ') pg_max ' \
+              'cross join (' \
+              'select ' \
+              'played_word, MIN(occurrences) as occurrences ' \
+              'from (select played_word, count(*) as occurrences from played_games GROUP BY played_word)' \
+              ') pg_min ' \
+              'cross join (' \
+              'select count(*) as games_won from played_games where is_won=1' \
+              ') pg_wins ' \
+              'cross join (' \
+              'select count(*) as games_lost from played_games where is_won=0' \
+              ') pg_losses'
+
+        db_cursor.execute(sql)
+        result = db_cursor.fetchone()
+
+        word_most_played = result[0]
+        word_least_played = result[1]
+        wins = result[2]
+        losses = result[3]
+
+        usage_dto = UsageDTO(wins, losses, word_most_played, word_least_played)
+        return json.dumps(usage_dto.__dict__)
+
+
 ##
 # Response DTOs
 ##
@@ -89,6 +132,14 @@ class GameDTO:
         self.id_ = id_
         self.word = word
         self.hints = hints
+
+
+class UsageDTO:
+    def __init__(self, games_won, games_lost, word_most_played, word_least_played):
+        self.games_won = games_won
+        self.games_lost = games_lost
+        self.word_most_played = word_most_played
+        self.word_least_played = word_least_played
 
 
 ##
