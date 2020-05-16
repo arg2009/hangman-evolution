@@ -1,2 +1,2 @@
 release: yoyo apply
-web: python app.py $PORT
+web: yoyo apply && python app.py $PORT
