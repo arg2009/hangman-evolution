@@ -79,7 +79,7 @@ class GameController(ApiController):
         db_cursor.execute(sql)
         self.db_connection.commit()
 
-        game_dto = GameDTO(game_id, random_word.word, random_word.hint)
+        game_dto = GameDTO(game_id, random_word.word, random_word.hints)
         return json.dumps(game_dto.__dict__)
 
     def PATCH(self):
@@ -100,24 +100,24 @@ class GameController(ApiController):
 # Response DTOs
 ##
 class GameDTO:
-    def __init__(self, id_, word, hint):
+    def __init__(self, id_, word, hints):
         self.id_ = id_
         self.word = word
-        self.hint = hint
+        self.hints = hints
 
 
 ##
 # Data Entities
 ##
 class RandomWord:
-    def __init__(self, word, hint):
+    def __init__(self, word, hints):
         self.word = word
-        self.hint = hint
+        self.hints = hints
 
 
 def get_random_word():
-    # TODO: implement this properly by retrieving a random word and hint from some sort of data store
-    random_word = RandomWord("fun", "A noun")
+    # TODO: implement this properly by retrieving a random word and it's hints from some sort of data store
+    random_word = RandomWord("electrician", "A noun,Performs maintenance tasks in houses,Works with cables and wiring")
 
     return random_word
 
