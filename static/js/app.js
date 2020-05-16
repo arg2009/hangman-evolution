@@ -5,11 +5,11 @@ $( document ).ready(function () {
     class RandomWord {
         /**
          * @param {string} word
-         * @param {string} hint
+         * @param {string} hints
          */
-        constructor(word, hint) {
+        constructor(word, hints) {
             this.word = word;
-            this.hint = hint;
+            this.hints = hints;
         }
     }
     /**
@@ -20,23 +20,26 @@ $( document ).ready(function () {
         fillCharacter = "_";
 
         /**
-         * @param {number} id
+         * @param {string} id
          * @param {string} word
-         * @param {string} hint
+         * @param {array} hints
          */
-        constructor(id, word, hint) {
-            this.init(id, word, hint);
+        constructor(id, word, hints) {
+            this.init(id, word, hints);
         }
 
         /**
          * @param {number} id
          * @param {string} word
-         * @param {string} hint
+         * @param {array} hints
          */
-        init(id, word, hint) {
+        init(id, word, hints) {
             this.id = id;
             this.word = word.toUpperCase();
-            this.hint = hint;
+            this.hints = hints;
+            this.enabledHints = Array(hints.length);
+            this.enabledHints.fill(false);
+            this.enabledHints[0] = true;
 
             this.incorrectGuesses = 0;
             this.wordInProgress = this.word.split('').fill(this.fillCharacter);
@@ -64,6 +67,15 @@ $( document ).ready(function () {
             return found;
         }
 
+        revealAHint() {
+            for (let i=0; i < this.enabledHints.length; i++) {
+                if (this.enabledHints[i] !== true) {
+                    this.enabledHints[i] = true;
+                    break;
+                }
+            }
+        }
+
         /**
          * @return {boolean}
          */
@@ -87,7 +99,7 @@ $( document ).ready(function () {
     let $hangingManElement = $hangmanGame.find('.hanging-man');
     let $wordInProgressElement = $hangmanGame.find('.word-in-progress');
     let $wordHint = $hangmanGame.find('.word-hint');
-    let game = new Game("", "");
+    let game = new Game("", "", []);
 
     setupGame();
     resetGame();
@@ -124,7 +136,7 @@ $( document ).ready(function () {
         getNewGame()
             .then(response => response.json())
             .then(data => {
-                let randomWord = new RandomWord(data.word, data.hint);
+                let randomWord = new RandomWord(data.word, data.hints);
                 initGame(data['id_'], randomWord);
             });
     }
@@ -135,7 +147,7 @@ $( document ).ready(function () {
      * @param {RandomWord} randomWord
      */
     function initGame(id, randomWord) {
-        game.init(id, randomWord.word, randomWord.hint);
+        game.init(id, randomWord.word, randomWord.hints.split(','));
         drawHangingMan();
         drawWordInProgress();
         drawWordHint();
@@ -207,12 +219,29 @@ $( document ).ready(function () {
         }
     }
 
+    function revealAHint() {
+        game.revealAHint();
+        drawWordHint();
+    }
+
     function drawWordInProgress() {
         $wordInProgressElement.text(game.wordInProgress.toString());
     }
 
     function drawWordHint() {
-        $wordHint.text(game.hint);
+        let hints = $('<div></div>');
+        for (let i=0; i < game.hints.length; i++) {
+            if (game.enabledHints[i]) {
+                hints.append($('<div>' + game.hints[i] + '</div>'));
+            }
+        }
+        let $button = $('<button>Reveal another hint</button>');
+        $button.click(function() {
+            revealAHint();
+        });
+
+        hints.append($button);
+        $wordHint.html(hints);
     }
 
     function drawHangingMan() {
