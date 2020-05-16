@@ -11,9 +11,6 @@ SQLITE_DB = "database/db.sqlite"
 urls = (
     # View Routes
     '/', 'Index',
-    
-    # API Routes
-    '/api/random-word', 'ApiWord',
 
     # Game Routes
     '/api/game', 'GameController'
@@ -47,18 +44,6 @@ class ApiController(object):
 
         # Set content type for all API controllers
         web.header("Content-Type", "application/json")
-
-
-# /api/random-word Route
-class ApiWord:
-    def GET(self):
-        # Set content type
-        web.header("Content-Type", "application/json")
-
-        # TODO: implement this propery by retrieving a random word and hint from some sort of data store
-        data = {"word": "fun", "hint": "A noun"}
-
-        return json.dumps(data)
 
 
 # /api/game
