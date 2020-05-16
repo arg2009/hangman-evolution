@@ -157,6 +157,25 @@ $( document ).ready(function () {
     }
 
     /**
+     * @return {Promise<Response>}
+     */
+    function recordGameResult() {
+        return fetch(
+            "/api/game",
+            {
+                method: "PATCH",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id_: game.id,
+                    is_won: game.hasWon()
+                })
+            }
+        );
+    }
+
+    /**
      * @param {Event} event
      */
     function playLetter(event) {
@@ -178,11 +197,13 @@ $( document ).ready(function () {
         if (game.hasLost()) {
             alert('You have reached the maximum guesses! The word was: ' + game.word)
             enableGame(false);
+            recordGameResult();
         }
 
         if (game.hasWon()) {
             alert('You won! Well done!');
             enableGame(false);
+            recordGameResult();
         }
     }
 

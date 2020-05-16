@@ -82,6 +82,19 @@ class GameController(ApiController):
         game_dto = GameDTO(game_id, random_word.word, random_word.hint)
         return json.dumps(game_dto.__dict__)
 
+    def PATCH(self):
+        data = json.loads(web.data())
+
+        id_ = data['id_']
+        is_won = (0, 1)[data['is_won']]
+        completed_at = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+
+        # Update if the game was won or lost in the DB
+        db_cursor = self.db_connection.cursor()
+        sql = f"UPDATE played_games SET is_won={is_won}, completed_at='{completed_at}' where created_at='{id_}';"
+        db_cursor.execute(sql)
+        self.db_connection.commit()
+
 
 ##
 # Response DTOs
