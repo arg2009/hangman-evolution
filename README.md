@@ -4,7 +4,7 @@ A fun project to get to know python
 
 ## Requirements
 
-These requirements assumes you run linux.
+These requirements assumes you run a Debian based linux.
 
 If you run windows install WSL (Ubuntu) to run Linux on Windows.
 
@@ -22,6 +22,7 @@ sudo apt-get install python3-pip
 git clone https://github.com/arg2009/hangman-evolution.git
 cd hangman-evolution
 pip3 install -r requirements.txt
+yoyo apply
 ```
 
 ## Launch the web app

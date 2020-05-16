@@ -1,1 +1,2 @@
 web.py==0.51
+yoyo-migrations==7.0.2
