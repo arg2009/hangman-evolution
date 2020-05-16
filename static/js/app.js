@@ -20,18 +20,21 @@ $( document ).ready(function () {
         fillCharacter = "_";
 
         /**
+         * @param {number} id
          * @param {string} word
          * @param {string} hint
          */
-        constructor(word, hint) {
-            this.init(word, hint);
+        constructor(id, word, hint) {
+            this.init(id, word, hint);
         }
 
         /**
+         * @param {number} id
          * @param {string} word
          * @param {string} hint
          */
-        init(word, hint) {
+        init(id, word, hint) {
+            this.id = id;
             this.word = word.toUpperCase();
             this.hint = hint;
 
@@ -118,20 +121,21 @@ $( document ).ready(function () {
         enableGame(false);
         resetPlayedButtons();
 
-        getRandomWord()
+        getNewGame()
             .then(response => response.json())
             .then(data => {
                 let randomWord = new RandomWord(data.word, data.hint);
-                initGame(randomWord);
+                initGame(data['id_'], randomWord);
             });
     }
 
     /**
      *
+     * @param {number} id
      * @param {RandomWord} randomWord
      */
-    function initGame(randomWord) {
-        game.init(randomWord.word, randomWord.hint);
+    function initGame(id, randomWord) {
+        game.init(id, randomWord.word, randomWord.hint);
         drawHangingMan();
         drawWordInProgress();
         drawWordHint();
@@ -143,8 +147,13 @@ $( document ).ready(function () {
     /**
      * @returns {Promise<Response>}
      */
-    function getRandomWord() {
-        return fetch("/api/random-word");
+    function getNewGame() {
+        return fetch(
+            "/api/game",
+            {
+                method: "POST"
+            }
+        );
     }
 
     /**
